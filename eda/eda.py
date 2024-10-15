@@ -4,6 +4,7 @@ import numpy as np
 import seaborn as sns
 import statsmodels.api as sm
 from statsmodels.tsa.stattools import adfuller
+from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
 
 
 
@@ -132,3 +133,33 @@ def adf_test(series, title=''):
 for crypto_name in box_data.columns:
     adf_test(box_data[crypto_name], crypto_name)
     ## Show the adf test for each crypto
+    
+    
+    
+    
+# Plot ACF for each cryptocurrency in a 2x3 layout
+plt.figure(figsize=(16, 12))
+
+for i, crypto_name in enumerate(box_data.columns, 1):
+    plt.subplot(2, 3, i)  # 2 rows and 3 columns
+    plot_acf(box_data[crypto_name].dropna(), lags=30, ax=plt.gca())
+    plt.title(f'ACF for {crypto_name}')
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+# Plot PACF for each cryptocurrency in a 2x3 layout
+plt.figure(figsize=(16, 12))
+
+for i, crypto_name in enumerate(box_data.columns, 1):
+    plt.subplot(2, 3, i)  # 2 rows and 3 columns
+    plot_pacf(box_data[crypto_name].dropna(), lags=30, ax=plt.gca())
+    plt.title(f'PACF for {crypto_name}')
+
+plt.tight_layout()
+plt.show()
