@@ -131,3 +131,4 @@ def adf_test(series, title=''):
 # Perform ADF test for each cryptocurrency
 for crypto_name in box_data.columns:
     adf_test(box_data[crypto_name], crypto_name)
+    ## Show the adf test for each crypto
