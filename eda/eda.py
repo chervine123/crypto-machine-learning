@@ -113,8 +113,6 @@ plt.show()
 
 ## ADF test
 
-# Combine the adjusted close prices into a DataFrame
-# box_data = pd.DataFrame(crypto_data)
 
 # Function to perform ADF test
 def adf_test(series, title=''):
@@ -133,9 +131,7 @@ def adf_test(series, title=''):
 for crypto_name in box_data.columns:
     adf_test(box_data[crypto_name], crypto_name)
     ## Show the adf test for each crypto
-    
-    
-    
+      
     
 # Plot ACF for each cryptocurrency in a 2x3 layout
 plt.figure(figsize=(16, 12))
@@ -149,10 +145,6 @@ plt.tight_layout()
 plt.show()
 
 
-
-
-
-
 # Plot PACF for each cryptocurrency in a 2x3 layout
 plt.figure(figsize=(16, 12))
 
@@ -160,6 +152,52 @@ for i, crypto_name in enumerate(box_data.columns, 1):
     plt.subplot(2, 3, i)  # 2 rows and 3 columns
     plot_pacf(box_data[crypto_name].dropna(), lags=30, ax=plt.gca())
     plt.title(f'PACF for {crypto_name}')
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+## Volatility Analysis
+
+for crypto_name, file in files.items():
+    try:
+        file_path = f"../data/{file}"
+        
+        # Parsing dates
+        if crypto_name == 'ADA':
+            data = pd.read_csv(file_path, parse_dates=['Date'], dayfirst=True)
+        else:
+            data = pd.read_csv(file_path, parse_dates=['Date'])
+        
+        data.set_index('Date', inplace=True)
+        
+        # Store the DataFrame directly to allow for additional columns
+        crypto_data[crypto_name] = data[['Adj Close']].copy()  ## small modifications compared to the initial data read in
+
+    except Exception as e:
+        print(f"Error processing {file}: {e}")
+
+# Calculate daily returns and rolling volatility for each cryptocurrency
+volatility_window = 30  # Adjust the rolling window as needed
+
+for crypto_name, data in crypto_data.items():
+    data['daily_return'] = data['Adj Close'].pct_change()  # Daily returns
+    data['rolling_volatility'] = data['daily_return'].rolling(window=volatility_window).std()  # Rolling volatility
+
+# Plot rolling volatility for each cryptocurrency
+plt.figure(figsize=(14, 10))
+
+for i, (crypto_name, data) in enumerate(crypto_data.items(), 1):
+    plt.subplot(3, 2, i)
+    plt.plot(data['rolling_volatility'], label=f'{crypto_name} 30-Day Rolling Volatility', color='navy')
+    plt.title(f'{crypto_name} Rolling Volatility')
+    plt.xlabel('Date')
+    plt.ylabel('Volatility')
+    plt.legend()
+    plt.grid()
 
 plt.tight_layout()
 plt.show()
